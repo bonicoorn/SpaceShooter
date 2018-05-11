@@ -11,7 +11,8 @@ public class Boundary
 
 
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour
+{
 
     public float speed = 10;
     public Boundary boundary;
@@ -43,13 +44,13 @@ public class PlayerController : MonoBehaviour {
     {
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
-        rigidbody.rotation = Quaternion.Euler(0f, 0f, rigidbody.velocity.x*-tilt);
-        rigidbody.velocity = new Vector3(moveHorizontal, 0, moveVertical)*speed;
+        rigidbody.rotation = Quaternion.Euler(0f, 0f, rigidbody.velocity.x * -tilt);
+        rigidbody.velocity = new Vector3(moveHorizontal, 0, moveVertical) * speed;
         rigidbody.position = new Vector3
             (
             Mathf.Clamp(rigidbody.position.x, boundary.xMin, boundary.xMax),
             0f,
-            Mathf.Clamp(rigidbody.position.z,boundary.zMin,boundary.zMax)
+            Mathf.Clamp(rigidbody.position.z, boundary.zMin, boundary.zMax)
             );
     }
 }
