@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
     public Quaternion calibrationQuaternion;
 
     public SimpleTouchPad touchPad;
+    public SimpleTouchAreaButton areaButton;
 
     private void Start()
     {
@@ -65,7 +66,8 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButton("MyFire") && Time.time > nextFire)
+        //if (Input.GetButton("MyFire") && Time.time > nextFire)
+        if (areaButton.CanFire() && Time.time > nextFire)
         {
             nextFire = Time.time + fireRate;
             //GameObject clone
@@ -94,16 +96,22 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //каждый кадр получаем положение телефона в пространстве
-        Vector3 accelerationRaw = Input.acceleration;
+        //Vector3 accelerationRaw = Input.acceleration;
 
         //получаем координаты текущего положения телефона относительно стартового положения
-        Vector3 acceleration = FixAcceleration(accelerationRaw);
+        //Vector3 acceleration = FixAcceleration(accelerationRaw);
+
+        Vector2 direction = touchPad.GetDirection();
 
         //float moveHorizontal = Input.GetAxis("Horizontal");
         //float moveVertical = Input.GetAxis("Vertical");
         rigidbody.rotation = Quaternion.Euler(0f, 0f, rigidbody.velocity.x * -tilt);
+
         //rigidbody.velocity = new Vector3(moveHorizontal, 0, moveVertical) * speed;
-        rigidbody.velocity = new Vector3(acceleration.x, 0, acceleration.y) * speed;
+
+        //rigidbody.velocity = new Vector3(acceleration.x, 0, acceleration.y) * speed;
+
+        rigidbody.velocity = new Vector3(direction.x, 0, direction.y) * speed;
         rigidbody.position = new Vector3
             (
             Mathf.Clamp(rigidbody.position.x, boundary.xMin, boundary.xMax),

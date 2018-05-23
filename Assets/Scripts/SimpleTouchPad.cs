@@ -9,33 +9,55 @@ public class SimpleTouchPad : MonoBehaviour, IPointerDownHandler, IPointerUpHand
 
     Vector2 origin;
     Vector2 direction;
+    Vector2 smothDirection;
+
+    int pointerID;
+    bool touched;
+
+
+    public float smothing;
 
     private void Awake()
     {
         direction = Vector2.zero;
+        touched = false;
     }
 
 
 
     public void OnDrag(PointerEventData eventData)
     {
-        Vector2 currentPosition = eventData.position;
-        Vector2 directionRaw = currentPosition - origin;
-        direction = directionRaw.normalized;
+        if (eventData.pointerId == pointerID)
+        {
+            Vector2 currentPosition = eventData.position;
+            Vector2 directionRaw = currentPosition - origin;
+            direction = directionRaw.normalized;
+        }
+            
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        origin = eventData.position;
+        if (!touched)
+        {
+            origin = eventData.position;
+            touched = true;
+            pointerID = eventData.pointerId;
+        }
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        direction = Vector2.zero;
+        if(eventData.pointerId == pointerID)
+        {
+            direction = Vector2.zero;
+            touched = false;
+        }
     }
 
     public Vector2 GetDirection()
     {
-        return direction;
+        smothDirection = Vector2.MoveTowards(smothDirection, direction, smothing); 
+        return smothDirection;
     }
 }
