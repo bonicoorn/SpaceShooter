@@ -20,8 +20,13 @@ public class PlayerController : MonoBehaviour
     Rigidbody rigidbody;
 
     public GameObject shot;
-    public Transform shotSpawn;
+    public GameObject megaShot;
+
+    public Transform[] shotSpawns;
+
     public float fireRate = 0.5f;
+    public float fireRateMegaShot = 0.5f;
+
     public float nextFire = 0.0f;
 
 
@@ -36,7 +41,24 @@ public class PlayerController : MonoBehaviour
         {
             nextFire = Time.time + fireRate;
             //GameObject clone
-            Instantiate(shot, shotSpawn.position, shotSpawn.rotation); //as GameObject
+            foreach(var shotSpawn in shotSpawns)
+            {
+                Instantiate(shot, shotSpawn.position, shotSpawn.rotation); //as GameObject
+            }
+            
+            GetComponent<AudioSource>().Play();
+        }
+
+        //если нажата кнопка из набора Fire2(правая мыши или левый Alt) и по времени возможен выстрел
+        if(Input.GetButton("Fire2") && Time.time > nextFire)
+        {
+            //указываем время для следующего выстрела
+            nextFire = Time.time + fireRateMegaShot;
+
+            //создается клон пребафа супер-выстрела
+            Instantiate(megaShot, shotSpawns[0].position, shotSpawns[0].rotation);
+            
+            //звук запуска снаряда
             GetComponent<AudioSource>().Play();
         }
     }

@@ -14,6 +14,8 @@ public class DestroyByContact : MonoBehaviour
 
     GameController gameController;
 
+    public GameObject megaExplosion;
+
     private void Start()
     {
         GameObject gameControllerObject = GameObject.FindGameObjectWithTag("GameController");
@@ -25,6 +27,25 @@ public class DestroyByContact : MonoBehaviour
         {
             Debug.Log("GameController не найден");
         }
+    }
+
+     
+    /// <summary>
+    /// функция обрабатывает столкновения
+    /// если любая частица Particle System столкнулась с объектом, к которому привязан данный скрипт, то обрабатывается код внутри данного метода
+    /// (сработает если на Particle System объекте включено Send Collision Messages)
+    /// </summary>
+    /// <param name="other"></param>
+    private void OnParticleCollision(GameObject other)
+    {
+        //клонируем префаб взрыва
+        cloneExplotion = (GameObject)Instantiate(megaExplosion, GetComponent<Rigidbody>().position, GetComponent<Rigidbody>().rotation);
+        //уничтожаем объект, на котором данный скрипт
+        Destroy(gameObject);
+        //удаляем клон взыва, после того как он произошел и отработала анимация
+        Destroy(cloneExplotion, 0.7f);
+        //начисление очков за уничтожение
+        gameController.AddToScore(scoreValue);
     }
 
     private void OnTriggerEnter(Collider other)
