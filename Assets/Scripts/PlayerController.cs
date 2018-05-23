@@ -29,11 +29,39 @@ public class PlayerController : MonoBehaviour
 
     public float nextFire = 0.0f;
 
+    public Quaternion calibrationQuaternion;
+
+    public SimpleTouchPad touchPad;
 
     private void Start()
     {
+        CalibrateAccelerometr();
+
         rigidbody = GetComponent<Rigidbody>();
     }
+
+    private void CalibrateAccelerometr()
+    {
+        //получаем данные с датчика акселерометра и записываем в переменную
+        Vector3 accelerationSnapshot = Input.acceleration;
+
+        //поворачиваем из положения лицом вверх в положение, которое было получено из акселерометра
+        //функция возвращает координаты положения телефона в пространстве типа кватернион
+        //т.е. текущее положение телефона
+        Quaternion rotateQuaternion = Quaternion.FromToRotation(new Vector3(0.0f, 0.0f, -1.0f), accelerationSnapshot);
+
+
+        //инвертируем значение осей
+        calibrationQuaternion = Quaternion.Inverse(rotateQuaternion);
+        //calibrationQuaternion = rotateQuaternion;
+    }
+
+    public Vector3 FixAcceleration(Vector3 acceleration)
+    {
+        //умножаем стартовое положение телефона на текущее и получаем текущее положение телефона с учетом калибровки
+        return calibrationQuaternion * acceleration;
+    }
+
 
     private void Update()
     {
@@ -65,10 +93,17 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        //каждый кадр получаем положение телефона в пространстве
+        Vector3 accelerationRaw = Input.acceleration;
+
+        //получаем координаты текущего положения телефона относительно стартового положения
+        Vector3 acceleration = FixAcceleration(accelerationRaw);
+
+        //float moveHorizontal = Input.GetAxis("Horizontal");
+        //float moveVertical = Input.GetAxis("Vertical");
         rigidbody.rotation = Quaternion.Euler(0f, 0f, rigidbody.velocity.x * -tilt);
-        rigidbody.velocity = new Vector3(moveHorizontal, 0, moveVertical) * speed;
+        //rigidbody.velocity = new Vector3(moveHorizontal, 0, moveVertical) * speed;
+        rigidbody.velocity = new Vector3(acceleration.x, 0, acceleration.y) * speed;
         rigidbody.position = new Vector3
             (
             Mathf.Clamp(rigidbody.position.x, boundary.xMin, boundary.xMax),
